@@ -36,7 +36,8 @@ class OtpController extends GetxController {
             "lastname": lastname,
             "password": password,
             "email": email,
-            "fcmToken": ""
+            "fcmToken": "",
+            "isonline": false
           });
           Get.back();
           Get.back();

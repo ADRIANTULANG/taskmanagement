@@ -264,7 +264,25 @@ class ProfileView extends GetView<ProfileController> {
                     border: Border(top: BorderSide(color: Colors.grey))),
                 child: InkWell(
                   onTap: () {
-                    controller.updateAccount();
+                    if (controller.email.text.isEmpty ||
+                        controller.password.text.isEmpty ||
+                        controller.firstname.text.isEmpty ||
+                        controller.lastname.text.isEmpty ||
+                        controller.contact.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Empty field'),
+                      ));
+                    } else if (controller.email.text.isEmail == false) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Invalid Email'),
+                      ));
+                    } else if (controller.contact.text.length != 10) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Invalid Contact no'),
+                      ));
+                    } else {
+                      controller.updateAccount();
+                    }
                   },
                   child: Container(
                     decoration: BoxDecoration(

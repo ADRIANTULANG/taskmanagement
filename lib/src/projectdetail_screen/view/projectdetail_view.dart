@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:tm/services/getstorage_services.dart';
+import 'package:tm/src/chat_screen/view/chat_view.dart';
 import 'package:tm/src/projectdetail_screen/botomsheets/projectdetail_bottomsheet.dart';
 import 'package:tm/src/projectdetail_screen/controller/projectdetail_controller.dart';
 import 'package:tm/src/projectdetail_screen/view/shared_resources.dart';
@@ -60,6 +61,20 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                                   ),
                                 ),
                               ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                right: 5.w,
+                              ),
+                              child: InkWell(
+                                  onTap: () {
+                                    Get.to(() => ChatView(), arguments: {
+                                      "project_id": controller.project_id.value,
+                                      "project_name":
+                                          controller.project_name.value
+                                    });
+                                  },
+                                  child: Icon(Icons.message_rounded)),
                             ),
                             Padding(
                               padding: EdgeInsets.only(

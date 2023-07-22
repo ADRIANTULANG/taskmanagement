@@ -21,6 +21,7 @@ class Members {
   String lastname;
   String image;
   RxBool isSelected;
+  bool isonline;
 
   Members({
     required this.id,
@@ -31,12 +32,14 @@ class Members {
     required this.lastname,
     required this.image,
     required this.isSelected,
+    required this.isonline,
   });
 
   factory Members.fromJson(Map<String, dynamic> json) => Members(
         id: json["id"],
         contactno: json["contactno"],
         email: json["email"],
+        isonline: json["isonline"],
         isSelected: false.obs,
         fcmToken: json["fcmToken"],
         firstname: json["firstname"],
@@ -49,6 +52,7 @@ class Members {
         "contactno": contactno,
         "isSelected": isSelected,
         "email": email,
+        "isonline": isonline,
         "fcmToken": fcmToken,
         "firstname": firstname,
         "lastname": lastname,

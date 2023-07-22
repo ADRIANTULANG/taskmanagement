@@ -1,10 +1,12 @@
 // import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:tm/services/getstorage_services.dart';
 import 'package:tm/services/notification_services.dart';
+import 'package:tm/src/chat_screen/controller/chat_controller.dart';
 // import 'package:tm/services/notification_services.dart';
 
 import 'src/splash_screen/view/splash_view.dart';
@@ -42,8 +44,22 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       print("App is Paused");
     } else if (state == AppLifecycleState.resumed) {
       print("App is Resumed");
+      if (Get.find<StorageServices>().storage.read('id') != null) {
+        if (Get.isRegistered<ChatController>() == true) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(Get.find<StorageServices>().storage.read('id'))
+              .update({"isonline": true});
+        }
+      }
     } else if (state == AppLifecycleState.inactive) {
       print("App is Inactive");
+      if (Get.find<StorageServices>().storage.read('id') != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(Get.find<StorageServices>().storage.read('id'))
+            .update({"isonline": false});
+      }
     }
   }
 

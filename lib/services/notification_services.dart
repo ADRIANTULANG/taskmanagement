@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'getstorage_services.dart';
+import 'package:http/http.dart' as http;
 
 class NotificationServices extends GetxService {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -94,27 +96,28 @@ class NotificationServices extends GetxService {
     // }
   }
 
-  // sendNotification({required String userToken}) async {
-  //   print(userToken);
-  //   var body = jsonEncode({
-  //     "to":
-  //         "AAAAoteaOlk:APA91bGVD6rRPh-Jx8AWKwGY7TQcMKXUjlj3NcRdgWUTAUxirZzJqFHbVQmX0GpabLR5IDdU5uSTEfRSijjwoO9qTGKH7f7WIfV4-blpVmC9rMSS6qQtPL5MLIXHlNz1MNnFAZspoSOP",
-  //     "notification": {
-  //       "body": "Hi your order is Accepted",
-  //       "title": "Food3ip",
-  //       "subtitle": "",
-  //     }
-  //   });
-  //   var e2epushnotif =
-  //       await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-  //           headers: {
-  //             "Authorization":
-  //                 "key=AAAAFXgQldg:APA91bH0blj9KQykFmRZ1Pjub61SPwFyaq-YjvtH1vTvsOeNQ6PTWCYm5S7pOZIuB5zuc7hrFFYsRbuxEB8vF9N5nQoW9fZckjy4bwwltxf4ATPeBDH4L4VlZ1yyVBHF3OKr3yVZ_Ioy",
-  //             "Content-Type": "application/json"
-  //           },
-  //           body: body);
-  //   print("e2e notif: ${e2epushnotif.body}");
-  // }
+  sendNotification(
+      {required String userToken,
+      required String bodymessage,
+      required String subtitle,
+      required String title}) async {
+    print(userToken);
+    var body = jsonEncode({
+      "to": "$userToken",
+      "notification": {
+        "body": "$bodymessage",
+        "title": "$title",
+        "subtitle": "$subtitle",
+      }
+    });
+    await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: {
+          "Authorization":
+              "key=AAAAoteaOlk:APA91bGVD6rRPh-Jx8AWKwGY7TQcMKXUjlj3NcRdgWUTAUxirZzJqFHbVQmX0GpabLR5IDdU5uSTEfRSijjwoO9qTGKH7f7WIfV4-blpVmC9rMSS6qQtPL5MLIXHlNz1MNnFAZspoSOP",
+          "Content-Type": "application/json"
+        },
+        body: body);
+  }
 
   Future<void> getToken() async {
     token = await messaging.getToken();

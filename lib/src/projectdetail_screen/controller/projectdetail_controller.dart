@@ -15,6 +15,7 @@ import 'package:tm/services/colors_services.dart';
 import 'package:tm/services/getstorage_services.dart';
 import 'package:tm/src/home_screen/controller/home_controller.dart';
 
+import '../../../services/notification_services.dart';
 import '../../home_screen/model/home_user_model.dart';
 import '../model/projectdetail_members_model.dart';
 import '../model/projectdetail_sharedfiles_model.dart';
@@ -110,6 +111,20 @@ class ProjectDetailController extends GetxController {
       });
       Get.back();
       getTask();
+      for (var i = 0; i < membersList.length; i++) {
+        if (membersList[i].id !=
+                Get.find<StorageServices>().storage.read('id') &&
+            membersList[i].fcmToken != "") {
+          Get.find<NotificationServices>().sendNotification(
+              userToken: membersList[i].fcmToken,
+              bodymessage:
+                  "${Get.find<StorageServices>().storage.read('firstname')} commented on a task from a group ${project_name.value}",
+              subtitle: "",
+              title: "Comment on a task");
+        } else {
+          print("online");
+        }
+      }
     } on Exception catch (e) {
       print(e);
     }
@@ -190,6 +205,7 @@ class ProjectDetailController extends GetxController {
       var user = await members[i]['user'].get();
       Map map = {
         "id": user.id,
+        "isonline": user.get('isonline'),
         "contactno": user.get('contactno'),
         "email": user.get('email'),
         "fcmToken": user.get('fcmToken') ?? "",
@@ -275,6 +291,20 @@ class ProjectDetailController extends GetxController {
       getTask();
       Get.snackbar("Message", "Task updated",
           backgroundColor: ColorServices.dirtywhite);
+      for (var i = 0; i < membersList.length; i++) {
+        if (membersList[i].id !=
+                Get.find<StorageServices>().storage.read('id') &&
+            membersList[i].fcmToken != "") {
+          Get.find<NotificationServices>().sendNotification(
+              userToken: membersList[i].fcmToken,
+              bodymessage:
+                  "${Get.find<StorageServices>().storage.read('firstname')} updated a task from a group ${project_name.value}",
+              subtitle: "",
+              title: "Task Update");
+        } else {
+          print("online");
+        }
+      }
     } catch (e) {}
   }
 
@@ -363,6 +393,20 @@ class ProjectDetailController extends GetxController {
       getFiles();
       Get.snackbar("Message", "File Uploaded",
           backgroundColor: ColorServices.dirtywhite);
+      for (var i = 0; i < membersList.length; i++) {
+        if (membersList[i].id !=
+                Get.find<StorageServices>().storage.read('id') &&
+            membersList[i].fcmToken != "") {
+          Get.find<NotificationServices>().sendNotification(
+              userToken: membersList[i].fcmToken,
+              bodymessage:
+                  "${Get.find<StorageServices>().storage.read('firstname')} shared a file from a group ${project_name.value}",
+              subtitle: "",
+              title: "Shared Files");
+        } else {
+          print("online");
+        }
+      }
     } catch (e) {
       print("ERROR: $e");
     }
