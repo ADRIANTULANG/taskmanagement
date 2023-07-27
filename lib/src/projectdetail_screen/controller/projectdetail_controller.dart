@@ -79,6 +79,7 @@ class ProjectDetailController extends GetxController {
     super.onInit();
   }
 
+  // mo pick ni sya sa image then after pick is eh upload nya ang image para ni sa image upload sa task
   pickImage({required String documentID}) async {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
@@ -100,6 +101,7 @@ class ProjectDetailController extends GetxController {
     }
   }
 
+// kani is ang comment function, naa pd dre ang notification every time naay mo comment is ma notify ang members sa group na ge comment si specific user
   commentToTask({required String documentID, required String comment}) async {
     try {
       var taskDocumentReference =
@@ -130,6 +132,7 @@ class ProjectDetailController extends GetxController {
     }
   }
 
+  // fucntion para mo get sa shared files sa project/group
   getFiles() async {
     try {
       List data = [];
@@ -152,6 +155,7 @@ class ProjectDetailController extends GetxController {
     } catch (e) {}
   }
 
+// mo get sa task sa group/project then eh display
   getTask() async {
     try {
       List data = [];
@@ -181,6 +185,7 @@ class ProjectDetailController extends GetxController {
     }
   }
 
+  // get function sa user nga dli member sa group/project for add member na purpose.
   getNotMember() async {
     allUsersNotMember.assignAll(Get.find<HomeController>().userList);
     allUsersNotMember.removeWhere((element) {
@@ -193,6 +198,8 @@ class ProjectDetailController extends GetxController {
       return result;
     });
   }
+
+  // get members sa group
 
   getMembers() async {
     List data = [];
@@ -222,6 +229,7 @@ class ProjectDetailController extends GetxController {
     isLoading(false);
   }
 
+  // search function para sa members sa group
   searchMembers({required String keyword}) async {
     membersList.clear();
     if (keyword != '') {
@@ -239,6 +247,8 @@ class ProjectDetailController extends GetxController {
     }
   }
 
+// mo create ug task inside the group
+// with assignee and deadline
   createTask() async {
     isCreatingTask(true);
     String memberid = '';
@@ -280,6 +290,7 @@ class ProjectDetailController extends GetxController {
     Get.back();
   }
 
+// mo update sa status sa task like completed na ang task or dli pa.
   updateTask({required String documentID, required String status}) async {
     try {
       await FirebaseFirestore.instance
@@ -308,6 +319,7 @@ class ProjectDetailController extends GetxController {
     } catch (e) {}
   }
 
+// mo add ug members sa group ang ma add lng is katong dli pa member sa group na user
   addMembers() async {
     try {
       var projectDocumentReference = await FirebaseFirestore.instance
@@ -339,6 +351,7 @@ class ProjectDetailController extends GetxController {
     } catch (e) {}
   }
 
+// mo pick ug image sa gallery
   pickFilesThenUpload() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowedExtensions: formats,
@@ -353,6 +366,8 @@ class ProjectDetailController extends GetxController {
       // User canceled the picker
     }
   }
+
+// mo upload ug files sa shared resources sa group
 
   uploadFile() async {
     try {
@@ -412,6 +427,7 @@ class ProjectDetailController extends GetxController {
     }
   }
 
+// mo download ug files using url or link.
   downloadFile(
       {required String link,
       required int index,

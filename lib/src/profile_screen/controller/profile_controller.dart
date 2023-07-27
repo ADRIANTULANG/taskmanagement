@@ -37,6 +37,7 @@ class ProfileController extends GetxController {
 
   RxBool isUpdating = false.obs;
 
+  // get sa user details.
   getUserDetails() async {
     try {
       var userDetails = await FirebaseFirestore.instance
@@ -57,6 +58,7 @@ class ProfileController extends GetxController {
     }
   }
 
+  // picker gyapon ni mo pick ug image from gallery
   getImage() async {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
@@ -67,6 +69,7 @@ class ProfileController extends GetxController {
     }
   }
 
+// update account function
   updateAccount() async {
     try {
       isUpdating.value = true;

@@ -16,6 +16,7 @@ class LoginController extends GetxController {
     super.onInit();
   }
 
+  // login function, mo get the ni ug user base sa ge input na username and passwords user if wala makita it means user did not exist if naa automatic mo navigate sa home page
   login() async {
     var res = await FirebaseFirestore.instance
         .collection('users')

@@ -20,6 +20,7 @@ class OtpController extends GetxController {
     super.onInit();
   }
 
+  // kani na function ang mo check if ang OTP code na ge input sa user is correct, if correct the success ang operation, if not correct then dli mo proceed ang operation
   void signInWithPhoneAuthCredential(
       PhoneAuthCredential phoneAuthCredential, context) async {
     try {

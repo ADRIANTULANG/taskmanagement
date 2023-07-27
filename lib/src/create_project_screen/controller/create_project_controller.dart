@@ -38,6 +38,7 @@ class CreateProjectController extends GetxController {
     super.onInit();
   }
 
+  //  kani na function is image picker ni sya so if ma trigger ni mo gawas dayun ang mga images na naa sa imoa phone then maka select dayun ka ddtu
   pickProjectImage() async {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
@@ -47,6 +48,8 @@ class CreateProjectController extends GetxController {
     }
   }
 
+// create project na function, mag create ni syag new project then naa na pd dre ang upload sa project image,
+// add sa members sa new project by the way ang storage sa mga image na na upload is naa sa firebase ra gyapon
   createProject() async {
     isCreatingProject(true);
     try {
@@ -65,16 +68,7 @@ class CreateProjectController extends GetxController {
         final snapshot = await uploadTask!.whenComplete(() {});
         fileLink = await snapshot.ref.getDownloadURL();
       }
-      // String type = '';
-      // if (fileType.value == 'png' ||
-      //     fileType.value == 'jpg' ||
-      //     fileType.value == 'svg' ||
-      //     fileType.value == 'jpeg' ||
-      //     fileType.value == 'gif') {
-      //   type = 'image';
-      // } else {
-      //   type = 'document';
-      // }
+
       var project =
           await FirebaseFirestore.instance.collection('projects').add({
         "name": name.text,

@@ -18,9 +18,9 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
+  // function sa pag get sa group/projects sa user, m
   getProject() async {
     List data = [];
-    // var res =
     var userDocumentReference = await FirebaseFirestore.instance
         .collection('users')
         .doc(Get.find<StorageServices>().storage.read('id'));
@@ -45,6 +45,7 @@ class HomeController extends GetxController {
     print(projectList.length);
   }
 
+  // functions sa pag get sa mga users
   getUsers() async {
     List data = [];
     var res = await FirebaseFirestore.instance.collection('users').get();

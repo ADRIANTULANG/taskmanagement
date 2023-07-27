@@ -32,6 +32,7 @@ class RegistrationController extends GetxController {
     }
   }
 
+// before mo register is eh check if ang email is existing na or dli
   checkIfEmailExist() async {
     try {
       var res = await FirebaseFirestore.instance
@@ -46,6 +47,7 @@ class RegistrationController extends GetxController {
     } catch (e) {}
   }
 
+// mo verify sa phone number then mag send ug OTP adtu na phone number
   verifiyNumber() async {
     isVerifyingNumber(true);
     await auth.verifyPhoneNumber(

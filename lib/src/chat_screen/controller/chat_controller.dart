@@ -39,6 +39,9 @@ class ChatController extends GetxController {
     super.onClose();
   }
 
+  // eh set ang status sa user to online, ginagamit ang online and offline status sa user para ma indicate kung mag trigger ba ug notification kung mag chat
+  // for example if user is online then dli sya maka received ug chat notif since naa man sya sa chat room and online man sya, if offline ang user the maka received syag
+  // chat notif kay wala man sya sa chat room then offline pd sya.
   setOnlineTrue() async {
     try {
       await FirebaseFirestore.instance
@@ -50,6 +53,9 @@ class ChatController extends GetxController {
     }
   }
 
+  // eh set ang status sa user to offline, ginagamit ang online and offline status sa user para ma indicate kung mag trigger ba ug notification kung mag chat
+  // for example if user is online then dli sya maka received ug chat notif since naa man sya sa chat room and online man sya, if offline ang user the maka received syag
+  // chat notif kay wala man sya sa chat room then offline pd sya.
   setOnlineFalse() async {
     try {
       await FirebaseFirestore.instance
@@ -61,6 +67,7 @@ class ChatController extends GetxController {
     }
   }
 
+// function para sa pag kuha sa mga members sa specific project/group
   getMembers() async {
     List data = [];
     var res = await FirebaseFirestore.instance
@@ -89,6 +96,7 @@ class ChatController extends GetxController {
         element.id == Get.find<StorageServices>().storage.read('id'));
   }
 
+  // kani na function is listener ni sa chats everytime na naay ma send na message or chat is kani na function ang mag listen.
   getListenToChats() async {
     try {
       streamChats = await FirebaseFirestore.instance
@@ -125,6 +133,7 @@ class ChatController extends GetxController {
     }
   }
 
+// function para mo send ug chat messages
   sendChat({required String message}) async {
     try {
       var userDocumentReference = await FirebaseFirestore.instance

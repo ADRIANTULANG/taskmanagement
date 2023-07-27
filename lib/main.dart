@@ -74,7 +74,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return Sizer(builder: (context, orientation, deviceType) {
       return GetMaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Task Management',
+        title: 'Collab & Share',
         theme: ThemeData(
           primarySwatch: Colors.grey,
         ),
