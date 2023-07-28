@@ -31,6 +31,8 @@ class ProjectDetailController extends GetxController {
 
   RxBool isLoading = true.obs;
   RxBool isCreatingTask = false.obs;
+  RxBool isUpdatingTask = false.obs;
+
   RxString deadline = ''.obs;
   DateTime deadlineDateTime = DateTime.now();
   RxList<Members> membersList = <Members>[].obs;
@@ -45,6 +47,9 @@ class ProjectDetailController extends GetxController {
 
   RxList<Users> allUsersNotMember = <Users>[].obs;
   RxList<Files> sharedFiles = <Files>[].obs;
+
+  RxBool isUpdatingProject = false.obs;
+  TextEditingController updateprojectname = TextEditingController();
 
   List<String> formats = [
     'png',
@@ -65,6 +70,10 @@ class ProjectDetailController extends GetxController {
   RxString fileName = ''.obs;
   RxString filePath = ''.obs;
   RxString fileType = ''.obs;
+
+  RxString updatefileName = ''.obs;
+  RxString updatefilePath = ''.obs;
+  RxString updatefileType = ''.obs;
   @override
   void onInit() async {
     project_id.value = await Get.arguments['project_id'];
@@ -98,6 +107,15 @@ class ProjectDetailController extends GetxController {
       getTask();
       Get.snackbar("Message", "Image uploaded",
           backgroundColor: ColorServices.dirtywhite);
+    }
+  }
+
+  pickProjectImage() async {
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      updatefilePath.value = image.path;
+      updatefileName.value = image.name;
+      updatefileType.value = image.path.split('/').last.split('.')[1];
     }
   }
 
@@ -451,5 +469,143 @@ class ProjectDetailController extends GetxController {
           sharedFiles[index].isDownloading.value = false;
           print("ERROR: $error");
         });
+  }
+
+  // DELETE PROJECTS
+  deleteProject({required String documentID}) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('projecs')
+          .doc(documentID)
+          .delete();
+      // DELETE TASK FOR THE PROJECTS
+      var taskRes = await FirebaseFirestore.instance
+          .collection('task')
+          .where('project_id', isEqualTo: documentID)
+          .get();
+      var task = taskRes.docs;
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+      for (var i = 0; i < task.length; i++) {
+        var taskDocumentReference =
+            await FirebaseFirestore.instance.collection('task').doc(task[i].id);
+        batch.delete(taskDocumentReference);
+      }
+      await batch.commit();
+      // DELETE MEMBERS FOR THE PROJECTS
+      var membersRes = await FirebaseFirestore.instance
+          .collection('members')
+          .where('project_id', isEqualTo: documentID)
+          .get();
+      var members = membersRes.docs;
+      WriteBatch batchMembers = FirebaseFirestore.instance.batch();
+      for (var i = 0; i < members.length; i++) {
+        var membersDocumentReference = await FirebaseFirestore.instance
+            .collection('members')
+            .doc(members[i].id);
+        batchMembers.delete(membersDocumentReference);
+      }
+      await batchMembers.commit();
+      // DELETE SHARED FILES FOR THE PROJECTS
+      var sharedfilesRes = await FirebaseFirestore.instance
+          .collection('sharedfiles')
+          .where('projectid', isEqualTo: documentID)
+          .get();
+      var sharedfiles = sharedfilesRes.docs;
+      WriteBatch batchsharedfiles = FirebaseFirestore.instance.batch();
+      for (var i = 0; i < sharedfiles.length; i++) {
+        var sharedfilesDocumentReference = await FirebaseFirestore.instance
+            .collection('sharedfiles')
+            .doc(sharedfiles[i].id);
+        batchsharedfiles.delete(sharedfilesDocumentReference);
+      }
+      await batchsharedfiles.commit();
+
+      // DELETE CHAT FOR THE PROJECTS
+      var chatRes = await FirebaseFirestore.instance
+          .collection('chats')
+          .where('groupid', isEqualTo: documentID)
+          .get();
+      var chats = chatRes.docs;
+      WriteBatch batchchat = FirebaseFirestore.instance.batch();
+      for (var i = 0; i < chats.length; i++) {
+        var chatDocumentReference = await FirebaseFirestore.instance
+            .collection('chats')
+            .doc(chats[i].id);
+        batchchat.delete(chatDocumentReference);
+      }
+      await batchchat.commit();
+      Get.back();
+      Get.back();
+      Get.find<HomeController>().getProject();
+    } catch (e) {}
+  }
+
+  updateTaskDetails({required String documentID}) async {
+    isUpdatingTask(true);
+    String memberid = '';
+    for (var i = 0; i < membersList.length; i++) {
+      if (membersList[i].isSelected.value == true) {
+        memberid = membersList[i].id;
+      }
+    }
+    try {
+      if (memberid != '') {
+        var memberDocumentRef =
+            await FirebaseFirestore.instance.collection('users').doc(memberid);
+        await FirebaseFirestore.instance
+            .collection('task')
+            .doc(documentID)
+            .update({
+          "task": task.text,
+          "assigned_to": memberDocumentRef,
+          'deadline': deadlineDateTime,
+        });
+        getTask();
+        Get.back();
+        Get.snackbar("Message", "Task Updated",
+            backgroundColor: ColorServices.dirtywhite);
+      } else {
+        Get.snackbar("Message", "Please choose assignee",
+            backgroundColor: ColorServices.dirtywhite);
+      }
+    } catch (e) {}
+    isUpdatingTask(false);
+  }
+
+  deleteTask({required String documentID}) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('task')
+          .doc(documentID)
+          .delete();
+      getTask();
+      Get.back();
+    } catch (e) {}
+  }
+
+  updateProject() async {
+    try {
+      String fileLink = project_image.value;
+      if (updatefilePath.value != '') {
+        isUpdatingProject(true);
+        Uint8List uint8list =
+            Uint8List.fromList(File(updatefilePath.value).readAsBytesSync());
+        final ref = await FirebaseStorage.instance
+            .ref()
+            .child("files/${updatefileName}");
+        uploadTask = ref.putData(uint8list);
+        final snapshot = await uploadTask!.whenComplete(() {});
+        fileLink = await snapshot.ref.getDownloadURL();
+      }
+      await FirebaseFirestore.instance
+          .collection('projects')
+          .doc(project_id.value)
+          .update({"image": fileLink, "name": updateprojectname.text});
+      project_image.value = fileLink;
+      project_name.value = updateprojectname.text;
+      Get.find<HomeController>().getProject();
+      Get.back();
+    } catch (e) {}
+    isUpdatingProject(true);
   }
 }

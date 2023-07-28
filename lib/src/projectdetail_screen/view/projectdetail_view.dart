@@ -7,6 +7,8 @@ import 'package:tm/src/chat_screen/view/chat_view.dart';
 import 'package:tm/src/projectdetail_screen/botomsheets/projectdetail_bottomsheet.dart';
 import 'package:tm/src/projectdetail_screen/controller/projectdetail_controller.dart';
 import 'package:tm/src/projectdetail_screen/view/shared_resources.dart';
+import 'package:tm/src/projectdetail_screen/view/update_project_screen.dart';
+import 'package:tm/src/projectdetail_screen/view/update_task_screen.dart';
 import '../../../services/colors_services.dart';
 import '../alertdialog/projectdetail_alertdialog.dart';
 import 'create_task_screen.dart';
@@ -34,13 +36,47 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        Container(
-                          height: 30.h,
-                          width: 100.w,
-                          child: Image(
-                              fit: BoxFit.cover,
-                              image:
-                                  NetworkImage(controller.project_image.value)),
+                        Stack(
+                          alignment: AlignmentDirectional.topEnd,
+                          children: [
+                            Container(
+                              height: 30.h,
+                              width: 100.w,
+                              child: Image(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                      controller.project_image.value)),
+                            ),
+                            Get.find<StorageServices>().storage.read('id') ==
+                                    controller.ownerid.value
+                                ? Positioned(
+                                    right: 3.w,
+                                    bottom: 21.h,
+                                    child: InkWell(
+                                      onTap: () {
+                                        controller.updatefileName.value = '';
+                                        controller.updatefilePath.value = '';
+                                        controller.updatefileType.value = '';
+                                        controller.updateprojectname.text =
+                                            controller.project_name.value;
+                                        controller.isUpdatingProject(false);
+                                        Get.to(() => UpdateProjectView());
+                                      },
+                                      child: Container(
+                                        height: 10.h,
+                                        width: 10.w,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            shape: BoxShape.circle),
+                                        child: Icon(
+                                          Icons.edit,
+                                          size: 18.sp,
+                                        ),
+                                      ),
+                                    ))
+                                : SizedBox()
+                          ],
                         ),
                         SizedBox(
                           height: 2.h,
@@ -62,6 +98,23 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                                 ),
                               ),
                             ),
+                            Get.find<StorageServices>().storage.read('id') ==
+                                    controller.ownerid.value
+                                ? Padding(
+                                    padding: EdgeInsets.only(
+                                      right: 5.w,
+                                    ),
+                                    child: InkWell(
+                                        onTap: () {
+                                          ProjectDetailAlertDialog
+                                              .deleteProject(
+                                                  controller: controller,
+                                                  documentID: controller
+                                                      .project_id.value);
+                                        },
+                                        child: Icon(Icons.delete)),
+                                  )
+                                : SizedBox(),
                             Padding(
                               padding: EdgeInsets.only(
                                 right: 5.w,
@@ -214,6 +267,86 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                                                 Text(controller.taskList[index]
                                                     .userDetails.email),
                                               ],
+                                            ),
+                                            PopupMenuButton(
+                                              itemBuilder: (context) => [
+                                                // PopupMenuItem 1
+                                                PopupMenuItem(
+                                                  value: "edit",
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.edit),
+                                                      SizedBox(
+                                                        width: 3.w,
+                                                      ),
+                                                      Text("Edit")
+                                                    ],
+                                                  ),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: "delete",
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.delete),
+                                                      SizedBox(
+                                                        width: 3.w,
+                                                      ),
+                                                      Text("Delete")
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                              color: Colors.white,
+                                              onSelected: (value) {
+                                                if (value == "edit") {
+                                                  for (var i = 0;
+                                                      i <
+                                                          controller.membersList
+                                                              .length;
+                                                      i++) {
+                                                    if (controller
+                                                            .membersList[i]
+                                                            .email ==
+                                                        controller
+                                                            .taskList[index]
+                                                            .userDetails
+                                                            .email) {
+                                                      controller
+                                                          .membersList[i]
+                                                          .isSelected
+                                                          .value = true;
+                                                    } else {
+                                                      controller
+                                                          .membersList[i]
+                                                          .isSelected
+                                                          .value = false;
+                                                    }
+                                                  }
+                                                  controller.deadline.value =
+                                                      DateFormat('yMMMd')
+                                                          .format(controller
+                                                              .taskList[index]
+                                                              .deadline);
+                                                  controller.task.text =
+                                                      controller
+                                                          .taskList[index].task;
+                                                  Get.to(() => UpdateTaskView(
+                                                      documentID: controller
+                                                          .taskList[index].id));
+                                                } else {
+                                                  ProjectDetailAlertDialog
+                                                      .deleteTask(
+                                                          controller:
+                                                              controller,
+                                                          documentID: controller
+                                                              .taskList[index]
+                                                              .id);
+                                                }
+                                              },
+                                              child: Icon(
+                                                Icons.more_vert,
+                                                color: Colors.black,
+                                              ),
                                             ),
                                           ],
                                         ),

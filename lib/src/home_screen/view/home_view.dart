@@ -92,7 +92,8 @@ class HomeView extends GetView<HomeController> {
                               children: [
                                 Expanded(
                                     child: Container(
-                                  padding: EdgeInsets.only(left: 2.w, top: 1.h),
+                                  padding: EdgeInsets.only(
+                                      left: 2.w, top: 1.h, right: 2.w),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
