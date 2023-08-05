@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:tm/services/getstorage_services.dart';
 
+import '../../login_screen/view/login_view.dart';
 import '../model/home_project_model.dart';
 import '../model/home_user_model.dart';
 
@@ -68,5 +69,15 @@ class HomeController extends GetxController {
     userList.assignAll(await usersFromJson(await jsonEncode(data)));
     userList.removeWhere((element) =>
         element.id == Get.find<StorageServices>().storage.read('id'));
+  }
+
+  logout() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(Get.find<StorageServices>().storage.read('id'))
+        .update({"deviceID": "", "deviceName": ""});
+    Get.back();
+    Get.find<StorageServices>().removeStorageCredentials();
+    Get.offAll(() => LoginView());
   }
 }

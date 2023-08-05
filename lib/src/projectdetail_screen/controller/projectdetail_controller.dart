@@ -26,6 +26,7 @@ class ProjectDetailController extends GetxController {
   RxString project_name = ''.obs;
   RxString project_image = ''.obs;
   RxString ownerid = ''.obs;
+  RxString project_progress = ''.obs;
 
   RxString date_created = ''.obs;
 
@@ -74,6 +75,9 @@ class ProjectDetailController extends GetxController {
   RxString updatefileName = ''.obs;
   RxString updatefilePath = ''.obs;
   RxString updatefileType = ''.obs;
+
+  RxBool isDownloadingImage = false.obs;
+  RxDouble progressImage = 0.0.obs;
   @override
   void onInit() async {
     project_id.value = await Get.arguments['project_id'];
@@ -82,9 +86,10 @@ class ProjectDetailController extends GetxController {
     date_created.value = await Get.arguments['date_created'];
     ownerid.value = await Get.arguments['ownerid'];
     await getMembers();
-    getTask();
+    await getTask();
     getNotMember();
     getFiles();
+    calculateProgress();
     super.onInit();
   }
 
@@ -203,6 +208,24 @@ class ProjectDetailController extends GetxController {
     }
   }
 
+  calculateProgress() async {
+    int count_of_task = taskList.length;
+    int count_of_task_completed = 0;
+    for (var i = 0; i < taskList.length; i++) {
+      if (taskList[i].status == "Completed") {
+        count_of_task_completed++;
+      }
+    }
+    if (count_of_task_completed == 0) {
+      project_progress.value = "0%";
+    } else {
+      project_progress.value = ((count_of_task_completed / count_of_task) * 100)
+              .toStringAsFixed(0)
+              .toString() +
+          "%";
+    }
+  }
+
   // get function sa user nga dli member sa group/project for add member na purpose.
   getNotMember() async {
     allUsersNotMember.assignAll(Get.find<HomeController>().userList);
@@ -317,7 +340,7 @@ class ProjectDetailController extends GetxController {
           .update({
         "status": status,
       });
-      getTask();
+      await getTask();
       Get.snackbar("Message", "Task updated",
           backgroundColor: ColorServices.dirtywhite);
       for (var i = 0; i < membersList.length; i++) {
@@ -334,6 +357,7 @@ class ProjectDetailController extends GetxController {
           print("online");
         }
       }
+      calculateProgress();
     } catch (e) {}
   }
 
@@ -363,6 +387,35 @@ class ProjectDetailController extends GetxController {
       await batch.commit();
       Get.back();
       Get.snackbar("Message", "New members added",
+          backgroundColor: ColorServices.dirtywhite);
+      await getMembers();
+      getNotMember();
+    } catch (e) {}
+  }
+
+  removeMembers() async {
+    try {
+      var res = await FirebaseFirestore.instance
+          .collection('members')
+          .where('project_id', isEqualTo: project_id.value)
+          .get();
+      var resmembers = res.docs;
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+      for (var i = 0; i < membersList.length; i++) {
+        if (membersList[i].isSelected.value == true) {
+          for (var x = 0; x < resmembers.length; x++) {
+            if (resmembers[x]['user'].id == membersList[i].id) {
+              var memberDocumentReference = await FirebaseFirestore.instance
+                  .collection('members')
+                  .doc(resmembers[x].id);
+              batch.delete(memberDocumentReference);
+            }
+          }
+        }
+      }
+      await batch.commit();
+      Get.back();
+      Get.snackbar("Message", "Member/s removed",
           backgroundColor: ColorServices.dirtywhite);
       await getMembers();
       getNotMember();
@@ -607,5 +660,28 @@ class ProjectDetailController extends GetxController {
       Get.back();
     } catch (e) {}
     isUpdatingProject(true);
+  }
+
+  downloadImageFile(
+      {required String link,
+      required BuildContext context,
+      required String filename}) async {
+    isDownloadingImage.value = true;
+    FileDownloader.downloadFile(
+        url: link,
+        name: filename,
+        onProgress: (fileName, progress) {
+          double percent = progress / 100;
+          progressImage.value = percent;
+        },
+        onDownloadCompleted: (String path) {
+          isDownloadingImage.value = false;
+          Get.snackbar("Message", "File Successfully downloaded",
+              backgroundColor: ColorServices.dirtywhite);
+        },
+        onDownloadError: (String error) {
+          isDownloadingImage.value = false;
+          print("ERROR: $error");
+        });
   }
 }

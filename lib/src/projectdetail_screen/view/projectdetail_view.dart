@@ -14,6 +14,8 @@ import '../alertdialog/projectdetail_alertdialog.dart';
 import 'create_task_screen.dart';
 import 'package:intl/intl.dart';
 
+import 'task_images_screen.dart';
+
 class ProjectDetailView extends GetView<ProjectDetailController> {
   const ProjectDetailView({super.key});
 
@@ -47,35 +49,68 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                                   image: NetworkImage(
                                       controller.project_image.value)),
                             ),
-                            Get.find<StorageServices>().storage.read('id') ==
-                                    controller.ownerid.value
-                                ? Positioned(
-                                    right: 3.w,
-                                    bottom: 21.h,
-                                    child: InkWell(
-                                      onTap: () {
-                                        controller.updatefileName.value = '';
-                                        controller.updatefilePath.value = '';
-                                        controller.updatefileType.value = '';
-                                        controller.updateprojectname.text =
-                                            controller.project_name.value;
-                                        controller.isUpdatingProject(false);
-                                        Get.to(() => UpdateProjectView());
-                                      },
+                            Positioned(
+                              right: 3.w,
+                              bottom: 21.h,
+                              child: Container(
+                                width: 100.w,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 5.w),
                                       child: Container(
-                                        height: 10.h,
-                                        width: 10.w,
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle),
-                                        child: Icon(
-                                          Icons.edit,
-                                          size: 18.sp,
-                                        ),
-                                      ),
-                                    ))
-                                : SizedBox()
+                                          height: 10.h,
+                                          width: 10.w,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle),
+                                          child: Text(
+                                            controller.project_progress.value,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 10.sp),
+                                          )),
+                                    ),
+                                    Get.find<StorageServices>()
+                                                .storage
+                                                .read('id') ==
+                                            controller.ownerid.value
+                                        ? InkWell(
+                                            onTap: () {
+                                              controller.updatefileName.value =
+                                                  '';
+                                              controller.updatefilePath.value =
+                                                  '';
+                                              controller.updatefileType.value =
+                                                  '';
+                                              controller
+                                                      .updateprojectname.text =
+                                                  controller.project_name.value;
+                                              controller
+                                                  .isUpdatingProject(false);
+                                              Get.to(() => UpdateProjectView());
+                                            },
+                                            child: Container(
+                                              height: 10.h,
+                                              width: 10.w,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle),
+                                              child: Icon(
+                                                Icons.edit,
+                                                size: 18.sp,
+                                              ),
+                                            ),
+                                          )
+                                        : SizedBox()
+                                  ],
+                                ),
+                              ),
+                            )
                           ],
                         ),
                         SizedBox(
@@ -153,7 +188,7 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                                         },
                                         child: Icon(Icons.person_add)),
                                   )
-                                : SizedBox()
+                                : SizedBox(),
                           ],
                         ),
                         Container(
@@ -168,50 +203,57 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 5.w, right: 5.w),
-                          child: Stack(
-                            alignment: AlignmentDirectional.centerStart,
-                            children: [
-                              Container(
-                                height: 8.h,
-                                width: 100.w,
-                              ),
-                              for (var stackindex = 0;
-                                  stackindex <
-                                      (controller.membersList.length > 5
-                                          ? 4
-                                          : controller.membersList.length);
-                                  stackindex++) ...[
-                                Positioned(
-                                    left: (stackindex.sp * 18),
-                                    child: Container(
-                                      height: 5.h,
-                                      width: 10.w,
-                                      decoration: BoxDecoration(
-                                          border: Border.all(),
-                                          shape: BoxShape.circle,
-                                          image: DecorationImage(
-                                              fit: BoxFit.cover,
-                                              image: NetworkImage(controller
-                                                  .membersList[stackindex]
-                                                  .image))),
-                                    )),
-                                controller.membersList.length > 5
-                                    ? Positioned(
-                                        left: ((controller.membersList.length) *
-                                            17),
-                                        child: Container(
-                                          child: Text(
-                                              (controller.membersList.length -
-                                                          5)
-                                                      .toString() +
-                                                  "+"),
-                                        ),
-                                      )
-                                    : SizedBox()
-                              ]
-                            ],
+                        InkWell(
+                          onTap: () {
+                            ProjectDetailBottomSheet.showrRemoveMembers(
+                                controller: controller);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 5.w, right: 5.w),
+                            child: Stack(
+                              alignment: AlignmentDirectional.centerStart,
+                              children: [
+                                Container(
+                                  height: 8.h,
+                                  width: 100.w,
+                                ),
+                                for (var stackindex = 0;
+                                    stackindex <
+                                        (controller.membersList.length > 5
+                                            ? 4
+                                            : controller.membersList.length);
+                                    stackindex++) ...[
+                                  Positioned(
+                                      left: (stackindex.sp * 18),
+                                      child: Container(
+                                        height: 5.h,
+                                        width: 10.w,
+                                        decoration: BoxDecoration(
+                                            border: Border.all(),
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                fit: BoxFit.cover,
+                                                image: NetworkImage(controller
+                                                    .membersList[stackindex]
+                                                    .image))),
+                                      )),
+                                  controller.membersList.length > 5
+                                      ? Positioned(
+                                          left:
+                                              ((controller.membersList.length) *
+                                                  17),
+                                          child: Container(
+                                            child: Text(
+                                                (controller.membersList.length -
+                                                            5)
+                                                        .toString() +
+                                                    "+"),
+                                          ),
+                                        )
+                                      : SizedBox()
+                                ]
+                              ],
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -366,39 +408,48 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                                                     .length ==
                                                 0
                                             ? SizedBox()
-                                            : Container(
-                                                height: 15.h,
-                                                width: 100.w,
-                                                child: ListView.builder(
-                                                  itemCount: controller
-                                                      .taskList[index]
-                                                      .images
-                                                      .length,
-                                                  scrollDirection:
-                                                      Axis.horizontal,
-                                                  physics:
-                                                      BouncingScrollPhysics(),
-                                                  itemBuilder:
-                                                      (BuildContext context,
-                                                          int imageIndex) {
-                                                    return Padding(
-                                                      padding: EdgeInsets.only(
-                                                          left: 2.w),
-                                                      child: Container(
-                                                        height: 15.h,
-                                                        width: 30.w,
-                                                        decoration: BoxDecoration(
-                                                            image: DecorationImage(
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                image: NetworkImage(controller
-                                                                        .taskList[
-                                                                            index]
-                                                                        .images[
-                                                                    imageIndex]))),
-                                                      ),
-                                                    );
-                                                  },
+                                            : InkWell(
+                                                onTap: () {
+                                                  Get.to(() => TaskImages(
+                                                        images: controller
+                                                            .taskList[index]
+                                                            .images,
+                                                      ));
+                                                },
+                                                child: Container(
+                                                  height: 15.h,
+                                                  width: 100.w,
+                                                  child: ListView.builder(
+                                                    itemCount: controller
+                                                        .taskList[index]
+                                                        .images
+                                                        .length,
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    physics:
+                                                        BouncingScrollPhysics(),
+                                                    itemBuilder:
+                                                        (BuildContext context,
+                                                            int imageIndex) {
+                                                      return Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                left: 2.w),
+                                                        child: Container(
+                                                          height: 15.h,
+                                                          width: 30.w,
+                                                          decoration: BoxDecoration(
+                                                              image: DecorationImage(
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                  image: NetworkImage(controller
+                                                                      .taskList[
+                                                                          index]
+                                                                      .images[imageIndex]))),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
                                                 ),
                                               ),
                                         controller.taskList[index].images

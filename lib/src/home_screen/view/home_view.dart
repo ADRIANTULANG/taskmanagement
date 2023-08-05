@@ -3,12 +3,11 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:tm/services/colors_services.dart';
 import 'package:intl/intl.dart';
-import 'package:tm/services/getstorage_services.dart';
-import 'package:tm/src/login_screen/view/login_view.dart';
 import 'package:tm/src/profile_screen/view/profile_view.dart';
 import 'package:tm/src/projectdetail_screen/view/projectdetail_view.dart';
 import '../../create_project_screen/view/create_project_view.dart';
 import '../controller/home_controller.dart';
+import '../widget/home_alertdialogs.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -32,8 +31,7 @@ class HomeView extends GetView<HomeController> {
           actions: [
             InkWell(
                 onTap: () {
-                  Get.find<StorageServices>().removeStorageCredentials();
-                  Get.offAll(() => LoginView());
+                  HomeAlertDialogs.showLogoutDialog();
                 },
                 child: Icon(Icons.logout)),
             SizedBox(
