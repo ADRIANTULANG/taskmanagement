@@ -35,8 +35,11 @@ class ProjectDetailController extends GetxController {
   RxBool isUpdatingTask = false.obs;
 
   RxString deadline = ''.obs;
+  RxString deadlineTime = ''.obs;
   DateTime deadlineDateTime = DateTime.now();
+  Duration? deadlineDateTimeDuration;
   RxList<Members> membersList = <Members>[].obs;
+  List<String> membersEmail = [];
   RxList<Members> membersList_masterList = <Members>[].obs;
 
   TextEditingController task = TextEditingController();
@@ -110,6 +113,28 @@ class ProjectDetailController extends GetxController {
         'images': FieldValue.arrayUnion([fileLink])
       });
       getTask();
+      Get.snackbar("Message", "Image uploaded",
+          backgroundColor: ColorServices.dirtywhite);
+    }
+  }
+
+  pickImageFromImageScreen({required String documentID}) async {
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      String path = image.path;
+      Uint8List uint8list = Uint8List.fromList(File(path).readAsBytesSync());
+      final ref =
+          await FirebaseStorage.instance.ref().child("files/${image.name}");
+      uploadTask = ref.putData(uint8list);
+      final snapshot = await uploadTask!.whenComplete(() {});
+      String fileLink = await snapshot.ref.getDownloadURL();
+      var taskDocumentReference =
+          await FirebaseFirestore.instance.collection('task').doc(documentID);
+      taskDocumentReference.update({
+        'images': FieldValue.arrayUnion([fileLink])
+      });
+      getTask();
+      Get.back();
       Get.snackbar("Message", "Image uploaded",
           backgroundColor: ColorServices.dirtywhite);
     }
@@ -267,6 +292,11 @@ class ProjectDetailController extends GetxController {
     }
     membersList.assignAll(await membersFromJson(jsonEncode(data)));
     membersList_masterList.assignAll(await membersFromJson(jsonEncode(data)));
+    for (var i = 0; i < membersList.length; i++) {
+      if (Get.find<StorageServices>().storage.read('id') != membersList[i].id) {
+        membersEmail.add(membersList[i].email);
+      }
+    }
     isLoading(false);
   }
 
@@ -298,7 +328,7 @@ class ProjectDetailController extends GetxController {
         memberid = membersList[i].id;
       }
     }
-
+    deadlineDateTime = deadlineDateTime.add(deadlineDateTimeDuration!);
     try {
       if (memberid != '') {
         var memberDocumentRef =
@@ -328,6 +358,7 @@ class ProjectDetailController extends GetxController {
   void onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
     deadline.value = DateFormat('yMMMd').format(args.value);
     deadlineDateTime = args.value;
+    print(deadlineDateTime);
     Get.back();
   }
 
@@ -601,6 +632,10 @@ class ProjectDetailController extends GetxController {
         memberid = membersList[i].id;
       }
     }
+    deadlineDateTime = DateTime(
+        deadlineDateTime.year, deadlineDateTime.month, deadlineDateTime.day);
+    deadlineDateTime = deadlineDateTime.add(deadlineDateTimeDuration!);
+
     try {
       if (memberid != '') {
         var memberDocumentRef =
@@ -683,5 +718,22 @@ class ProjectDetailController extends GetxController {
           isDownloadingImage.value = false;
           print("ERROR: $error");
         });
+  }
+
+  ontimeChanged(TimeOfDay args) {
+    deadlineTime.value = args.format(Get.context!);
+    deadlineDateTimeDuration = Duration(hours: args.hour, minutes: args.minute);
+  }
+
+  deleteImageFromTask(
+      {required List images,
+      required String documentID,
+      required String imageLink}) async {
+    images.removeWhere((element) => element == imageLink);
+    await FirebaseFirestore.instance
+        .collection('task')
+        .doc(documentID)
+        .update({"images": images});
+    getTask();
   }
 }

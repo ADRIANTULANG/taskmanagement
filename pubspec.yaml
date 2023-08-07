@@ -57,6 +57,9 @@ dependencies:
   syncfusion_flutter_datepicker: ^20.4.51
   device_info_plus: ^9.0.1
   carousel_slider: ^4.2.1
+  day_night_time_picker: ^1.2.0+2
+  add_2_calendar: ^2.1.2
+  
 
 
 dev_dependencies:

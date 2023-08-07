@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
@@ -73,32 +74,76 @@ class CreateTaskView extends GetView<ProjectDetailController> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(left: 5.w, right: 5.w),
-                      child: InkWell(
-                        onTap: () {
-                          ProjectDetailBottomSheet.showDate(
-                              controller: controller);
-                        },
-                        child: Container(
-                            padding: EdgeInsets.only(
-                              left: 2.w,
-                            ),
-                            height: 6.h,
-                            width: 100.w,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(3),
-                                border: Border.all(width: 0.8)),
-                            alignment: Alignment.centerLeft,
-                            child: Obx(
-                              () => Text(
-                                controller.deadline.value == ''
-                                    ? "Select Date"
-                                    : controller.deadline.value,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12.sp,
-                                    color: Colors.grey),
-                              ),
-                            )),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              ProjectDetailBottomSheet.showDate(
+                                  controller: controller);
+                            },
+                            child: Container(
+                                padding: EdgeInsets.only(
+                                  left: 2.w,
+                                ),
+                                height: 6.h,
+                                width: 43.w,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(3),
+                                    border: Border.all(width: 0.8)),
+                                alignment: Alignment.centerLeft,
+                                child: Obx(
+                                  () => Text(
+                                    controller.deadline.value == ''
+                                        ? "Select Date"
+                                        : controller.deadline.value,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12.sp,
+                                        color: Colors.grey),
+                                  ),
+                                )),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                showPicker(
+                                  context: context,
+                                  value: Time(
+                                      hour: DateTime.now().hour,
+                                      minute: DateTime.now().minute),
+                                  sunrise:
+                                      TimeOfDay(hour: 6, minute: 0), // optional
+                                  sunset: TimeOfDay(
+                                      hour: 18, minute: 0), // optional
+                                  duskSpanInMinutes: 120, // optional
+                                  onChange: controller.ontimeChanged,
+                                ),
+                              );
+                            },
+                            child: Container(
+                                padding: EdgeInsets.only(
+                                  left: 2.w,
+                                ),
+                                height: 6.h,
+                                width: 43.w,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(3),
+                                    border: Border.all(width: 0.8)),
+                                alignment: Alignment.centerLeft,
+                                child: Obx(
+                                  () => Text(
+                                    controller.deadlineTime.value == ''
+                                        ? "Select Time"
+                                        : controller.deadlineTime.value,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12.sp,
+                                        color: Colors.grey),
+                                  ),
+                                )),
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(

@@ -13,7 +13,7 @@ import '../../../services/colors_services.dart';
 import '../alertdialog/projectdetail_alertdialog.dart';
 import 'create_task_screen.dart';
 import 'package:intl/intl.dart';
-
+import 'package:add_2_calendar/add_2_calendar.dart';
 import 'task_images_screen.dart';
 
 class ProjectDetailView extends GetView<ProjectDetailController> {
@@ -102,6 +102,54 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                                                   shape: BoxShape.circle),
                                               child: Icon(
                                                 Icons.edit,
+                                                size: 18.sp,
+                                              ),
+                                            ),
+                                          )
+                                        : SizedBox()
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              right: 3.w,
+                              bottom: 14.h,
+                              child: Container(
+                                width: 100.w,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Get.find<StorageServices>()
+                                                .storage
+                                                .read('id') ==
+                                            controller.ownerid.value
+                                        ? InkWell(
+                                            onTap: () {
+                                              final Event event = Event(
+                                                title: 'Event title',
+                                                description:
+                                                    'Event description',
+                                                location: 'Event location',
+                                                startDate: DateTime(
+                                                    2023, 8, 7, 16, 30),
+                                                endDate: DateTime(
+                                                    2023, 8, 7, 16, 35),
+                                                androidParams: AndroidParams(
+                                                  emailInvites: controller
+                                                      .membersEmail, // on Android, you can add invite emails to your event.
+                                                ),
+                                              );
+                                              Add2Calendar.addEvent2Cal(event);
+                                            },
+                                            child: Container(
+                                              height: 10.h,
+                                              width: 10.w,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle),
+                                              child: Icon(
+                                                Icons.calendar_month,
                                                 size: 18.sp,
                                               ),
                                             ),
@@ -310,86 +358,107 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                                                     .userDetails.email),
                                               ],
                                             ),
-                                            PopupMenuButton(
-                                              itemBuilder: (context) => [
-                                                // PopupMenuItem 1
-                                                PopupMenuItem(
-                                                  value: "edit",
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(Icons.edit),
-                                                      SizedBox(
-                                                        width: 3.w,
+                                            controller.ownerid.value ==
+                                                    Get.find<StorageServices>()
+                                                        .storage
+                                                        .read('id')
+                                                ? PopupMenuButton(
+                                                    itemBuilder: (context) => [
+                                                      // PopupMenuItem 1
+                                                      PopupMenuItem(
+                                                        value: "edit",
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(Icons.edit),
+                                                            SizedBox(
+                                                              width: 3.w,
+                                                            ),
+                                                            Text("Edit")
+                                                          ],
+                                                        ),
                                                       ),
-                                                      Text("Edit")
-                                                    ],
-                                                  ),
-                                                ),
-                                                PopupMenuItem(
-                                                  value: "delete",
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(Icons.delete),
-                                                      SizedBox(
-                                                        width: 3.w,
+                                                      PopupMenuItem(
+                                                        value: "delete",
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(Icons.delete),
+                                                            SizedBox(
+                                                              width: 3.w,
+                                                            ),
+                                                            Text("Delete")
+                                                          ],
+                                                        ),
                                                       ),
-                                                      Text("Delete")
                                                     ],
-                                                  ),
-                                                ),
-                                              ],
-                                              color: Colors.white,
-                                              onSelected: (value) {
-                                                if (value == "edit") {
-                                                  for (var i = 0;
-                                                      i <
-                                                          controller.membersList
-                                                              .length;
-                                                      i++) {
-                                                    if (controller
-                                                            .membersList[i]
-                                                            .email ==
-                                                        controller
-                                                            .taskList[index]
-                                                            .userDetails
-                                                            .email) {
-                                                      controller
-                                                          .membersList[i]
-                                                          .isSelected
-                                                          .value = true;
-                                                    } else {
-                                                      controller
-                                                          .membersList[i]
-                                                          .isSelected
-                                                          .value = false;
-                                                    }
-                                                  }
-                                                  controller.deadline.value =
-                                                      DateFormat('yMMMd')
-                                                          .format(controller
-                                                              .taskList[index]
-                                                              .deadline);
-                                                  controller.task.text =
-                                                      controller
-                                                          .taskList[index].task;
-                                                  Get.to(() => UpdateTaskView(
-                                                      documentID: controller
-                                                          .taskList[index].id));
-                                                } else {
-                                                  ProjectDetailAlertDialog
-                                                      .deleteTask(
-                                                          controller:
-                                                              controller,
-                                                          documentID: controller
-                                                              .taskList[index]
-                                                              .id);
-                                                }
-                                              },
-                                              child: Icon(
-                                                Icons.more_vert,
-                                                color: Colors.black,
-                                              ),
-                                            ),
+                                                    color: Colors.white,
+                                                    onSelected: (value) {
+                                                      if (value == "edit") {
+                                                        for (var i = 0;
+                                                            i <
+                                                                controller
+                                                                    .membersList
+                                                                    .length;
+                                                            i++) {
+                                                          if (controller
+                                                                  .membersList[
+                                                                      i]
+                                                                  .email ==
+                                                              controller
+                                                                  .taskList[
+                                                                      index]
+                                                                  .userDetails
+                                                                  .email) {
+                                                            controller
+                                                                .membersList[i]
+                                                                .isSelected
+                                                                .value = true;
+                                                          } else {
+                                                            controller
+                                                                .membersList[i]
+                                                                .isSelected
+                                                                .value = false;
+                                                          }
+                                                        }
+                                                        controller.deadline
+                                                            .value = DateFormat(
+                                                                'yMMMd')
+                                                            .format(controller
+                                                                .taskList[index]
+                                                                .deadline);
+                                                        controller.deadlineTime
+                                                            .value = DateFormat(
+                                                                'jm')
+                                                            .format(controller
+                                                                .taskList[index]
+                                                                .deadline);
+                                                        controller.task.text =
+                                                            controller
+                                                                .taskList[index]
+                                                                .task;
+                                                        Get.to(() => UpdateTaskView(
+                                                            documentID:
+                                                                controller
+                                                                    .taskList[
+                                                                        index]
+                                                                    .id));
+                                                      } else {
+                                                        ProjectDetailAlertDialog
+                                                            .deleteTask(
+                                                                controller:
+                                                                    controller,
+                                                                documentID:
+                                                                    controller
+                                                                        .taskList[
+                                                                            index]
+                                                                        .id);
+                                                      }
+                                                    },
+                                                    child: Icon(
+                                                      Icons.more_vert,
+                                                      color: Colors.black,
+                                                    ),
+                                                  )
+                                                : SizedBox(),
                                           ],
                                         ),
                                         SizedBox(
@@ -411,9 +480,16 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                                             : InkWell(
                                                 onTap: () {
                                                   Get.to(() => TaskImages(
+                                                        documentID: controller
+                                                            .taskList[index].id,
+                                                        email: controller
+                                                            .taskList[index]
+                                                            .userDetails
+                                                            .email,
                                                         images: controller
                                                             .taskList[index]
-                                                            .images,
+                                                            .images
+                                                            .obs,
                                                       ));
                                                 },
                                                 child: Container(
@@ -481,8 +557,12 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                                             ),
                                             Text(
                                               DateFormat('yMMMd').format(
-                                                  controller.taskList[index]
-                                                      .deadline),
+                                                      controller.taskList[index]
+                                                          .deadline) +
+                                                  " " +
+                                                  DateFormat('jm').format(
+                                                      controller.taskList[index]
+                                                          .deadline),
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                               ),
@@ -661,13 +741,17 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                   ),
                 ),
               ),
-              floatingActionButton: FloatingActionButton(
-                backgroundColor: ColorServices.dirtywhite,
-                onPressed: () {
-                  Get.to(() => CreateTaskView());
-                },
-                child: Icon(Icons.add),
-              ),
+              floatingActionButton:
+                  Get.find<StorageServices>().storage.read('id') ==
+                          controller.ownerid.value
+                      ? FloatingActionButton(
+                          backgroundColor: ColorServices.dirtywhite,
+                          onPressed: () {
+                            Get.to(() => CreateTaskView());
+                          },
+                          child: Icon(Icons.add),
+                        )
+                      : SizedBox(),
             ),
     );
   }
