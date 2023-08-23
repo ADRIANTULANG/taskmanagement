@@ -9,6 +9,7 @@ import 'package:tm/src/projectdetail_screen/controller/projectdetail_controller.
 import 'package:tm/src/projectdetail_screen/view/shared_resources.dart';
 import 'package:tm/src/projectdetail_screen/view/update_project_screen.dart';
 import 'package:tm/src/projectdetail_screen/view/update_task_screen.dart';
+import 'package:tm/src/task_shared_files_screen/view/task_shared_files_view.dart';
 import '../../../services/colors_services.dart';
 import '../alertdialog/projectdetail_alertdialog.dart';
 import 'create_task_screen.dart';
@@ -667,6 +668,27 @@ class ProjectDetailView extends GetView<ProjectDetailController> {
                                                     color: Colors.white),
                                                 child: Icon(Icons
                                                     .messenger_outline_sharp),
+                                              ),
+                                            ),
+                                            InkWell(
+                                              onTap: () {
+                                                Get.to(
+                                                    () => TaskSharedFilesView(),
+                                                    arguments: {
+                                                      "taskID": controller
+                                                          .taskList[index].id,
+                                                      "project_id": controller
+                                                          .project_id.value
+                                                    });
+                                              },
+                                              child: Container(
+                                                height: 5.h,
+                                                width: 10.w,
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Colors.white),
+                                                child: Icon(
+                                                    Icons.folder_open_outlined),
                                               ),
                                             ),
                                           ],
